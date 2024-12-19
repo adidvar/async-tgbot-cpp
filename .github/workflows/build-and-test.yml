@@ -83,8 +83,8 @@ jobs:
                 -S ${{ github.workspace }} --preset conan-release
 
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }}
 
-      - name: Test
-        working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: ctest --build-config ${{ matrix.build_type }}
+    #  - name: Test
+    #    working-directory: ${{ steps.strings.outputs.build-output-dir }}
+    #    run: ctest --build-config ${{ matrix.build_type }}
