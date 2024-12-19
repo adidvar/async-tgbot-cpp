@@ -63,7 +63,13 @@ jobs:
         run: |
             echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-      - name: Configure CMake
+      - name: Configure CMake for Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} -S ${{ github.workspace }} --preset conan-default
+
+      - name: Configure CMake for Linux
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           cmake -B ${{ steps.strings.outputs.build-output-dir }} -S ${{ github.workspace }} --preset conan-release
 
