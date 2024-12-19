@@ -10,11 +10,41 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ${{ matrix.os }} 
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        compiler: [gcc-11, clang-14]
+        include:
+          -  os: windows-latest
+             compiler: gcc-11
+             # Add extra fields to `choco install mingw-w64-x86_64-gcc-11``
+             name: mingw-w64
+             version: 11.2.0
+          - os: windows-latest
+            # Override `clang-14` to use the MSVC provided clang
+            compiler: cl-clang
+          - os: macos-latest
+            compiler: gcc-11
+            # Add extra fields to `brew install` the correct version
+            package: gcc@11
+      fail-fast: false  # Continue testing even if one job fails, they are likely agnostic of each other 
+ 
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3 
+        
+       # Setup C++ build toolchain
+      - name: Install dependencies (Windows)
+        if: runner.os == "Windows" && matrix.name
+        run: choco install ${{ matrix.name }} --version ${{ matrix.version }}
+      - name: Install dependencies (macOS)
+        if: runner.os == "macOS" ** matrix.package
+        run: brew install ${{ matrix.package }}
+      - name: Install dependencies (Linux)
+        if: runner.os == "Linux"
+        run: sudo apt-get install ${{ matrix.compiler }}
 
       - name: Install Conan
         id: conan
@@ -51,7 +81,7 @@ jobs:
       - name: Build with CMake
         run: |
           cd build
-          cmake -S .. -DCMAKE_BUILD_TYPE=Release --preset conan-release -DENABLE_TESTS=ON
+          cmake -S .. -DCMAKE_BUILD_TYPE=Release --preset conan-release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DENABLE_TESTS=ON
           cmake --build . 
           
       - name: Test Project
