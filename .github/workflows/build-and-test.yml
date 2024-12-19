@@ -35,9 +35,9 @@ jobs:
             restore-keys: |
                 ${{ runner.os }}-conan-${{ matrix.build_type }}-v1
 
-      - if ${{steps.cache-conan.outputs.cache-hit != 'true'}}
-        name: Create default Conan profile
-        run: conan profile new default --detect
+      - name: Create default Conan profile
+        if: ${{steps.cache-conan.outputs.cache-hit != 'true'}}
+        run: conan profile detect
             
       - name: Install dependencies with Conan
         run: |
