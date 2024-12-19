@@ -28,7 +28,7 @@ jobs:
             
       - name: Install dependencies with Conan
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
