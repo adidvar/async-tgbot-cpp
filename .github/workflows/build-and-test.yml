@@ -15,19 +15,22 @@ jobs:
     strategy:
       fail-fast: false
 
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+matrix:
+  os: [ubuntu-latest, windows-latest, macos-latest]
+  build_type: [Release]
+  include:
+    - os: windows-latest
+      c_compiler: cl
+      cpp_compiler: cl
+    - os: ubuntu-latest
+      c_compiler: gcc
+      cpp_compiler: g++
+    - os: ubuntu-latest
+      c_compiler: clang
+      cpp_compiler: clang++
+    - os: macos-latest
+      c_compiler: clang
+      cpp_compiler: clang++
 
     steps:
       - name: Checkout repository
@@ -53,7 +56,7 @@ jobs:
 
       - name: Install dependencies with Conan
         run: |
-          conan install . --output-folder=build --build=missing
+          conan install . --output-folder=build --build=missing -s build_type=Release -s compiler.cppstd=17
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
@@ -69,8 +72,6 @@ jobs:
       - name: Configure CMake
         run: |
           cmake -B ${{ steps.strings.outputs.build-output-dir }} \
-                -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-                -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
                 -S ${{ github.workspace }} --preset conan-release
 
       - name: Build
