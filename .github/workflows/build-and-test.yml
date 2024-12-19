@@ -62,7 +62,7 @@ jobs:
 
       - name: Install dependencies with Conan
         run: |
-          conan install . --output-folder=build --build=missing --settings build_type=${{ matrix.build_type }}
+          conan install . --output-folder=build --build=missing
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
@@ -81,7 +81,7 @@ jobs:
                 -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
                 -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
                 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                -S ${{ github.workspace }} --preset conan-${{ matrix.build_type }}
+                -S ${{ github.workspace }} --preset conan-release
 
       - name: Build
         run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
