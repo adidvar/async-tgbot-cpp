@@ -18,8 +18,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
-        cpp_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
@@ -30,13 +28,6 @@ jobs:
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-        exclude:
-          - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
 
     steps:
       - name: Checkout repository
@@ -87,4 +78,4 @@ jobs:
 
     #  - name: Test
     #    working-directory: ${{ steps.strings.outputs.build-output-dir }}
-    #    run: ctest --build-config ${{ matrix.build_type }}
+    #    run: ctest --build-config ${{ matrix.build_type }} 
