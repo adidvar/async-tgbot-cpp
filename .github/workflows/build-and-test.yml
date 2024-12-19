@@ -3,18 +3,18 @@ name: Build and test
 on:
   push:
     branches:
-      - main  # Запускати workflow на пуш у гілку main
+      - master
   pull_request:
     branches:
-      - main  # Запускати на створення PR в main
+      - master
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Використовуємо Ubuntu для середовища
+    runs-on: ubuntu-latest 
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Клонування репозиторію
+        uses: actions/checkout@v3 
 
       - name: Install Conan
         id: conan
