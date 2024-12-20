@@ -1,0 +1,80 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        build_type: [Release]
+        include:
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3 
+
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+        with:
+            version: 2.6.0
+
+      - name: Create default Conan profile
+        run: conan profile detect
+
+      - name: Cache Conan Dependencies
+        id: cache-conan
+        uses: actions/cache@v2
+        with:
+          path: ~/.conan2
+          key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.txt') }}-${{ matrix.build_type }}-v1
+          restore-keys: |
+            ${{ runner.os }}-conan-${{ matrix.build_type }}-v1
+
+      - name: Install dependencies with Conan
+        run: |
+          conan install . --output-folder=build --build=missing -s build_type=Release -s compiler.cppstd=17
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+            cmake-version: '3.31.0'
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+            echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Configure and build for Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} -S ${{ github.workspace }} --preset conan-default
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}  --config Release
+
+      - name: Configure and build for Linux
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          cmake -B ${{ steps.strings.outputs.build-output-dir }} -S ${{ github.workspace }} --preset conan-release
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}
+
+    #  - name: Test
+    #    working-directory: ${{ steps.strings.outputs.build-output-dir }}
+    #    run: ctest --build-config ${{ matrix.build_type }} 
