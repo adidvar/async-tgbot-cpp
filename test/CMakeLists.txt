@@ -1,6 +1,6 @@
-file(GLOB_RECURSE TEST_SRC_LIST "./*.cpp")
+file(GLOB_RECURSE TEST_SRC_LIST "*.cpp")
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS unit_test_framework CONFIG)
 
 include_directories("${PROJECT_SOURCE_DIR}/test")
 add_executable(${PROJECT_NAME}_test ${TEST_SRC_LIST})

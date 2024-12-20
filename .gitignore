@@ -1,6 +1,9 @@
 ## Build ###
 build
 
+## Cmake ###
+CMakeUserPresets.json
+
 ## TODO ###
 TODO.txt
 
