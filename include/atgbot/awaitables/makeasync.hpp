@@ -118,9 +118,6 @@ struct makeAsync<T, Args...> {
    * @return The result of the callable execution.
    */
   R await_resume() noexcept {
-    if (!m_result.has_value()) {
-      PLOGW << "Resume of async";
-    }
     m_thread->join();         ///< Wait for the thread to finish execution.
     return m_result.value();  ///< Return the result of the execution.
   }
